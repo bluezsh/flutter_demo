@@ -34,18 +34,54 @@ class LogUtil {
     );
   }
 
+  /// 打印接口请求日志 (原子化输出，避免并发混淆)
+  static void logApi({
+    required String path,
+    required String method,
+    Object? params,
+    Object? response,
+    required Duration duration,
+    bool isError = false,
+  }) {
+    if (!kDebugMode) return;
+
+    final StringBuffer sb = StringBuffer();
+    sb.writeln('🚀 [API ${isError ? 'ERROR' : 'RESPONSE'}]');
+    sb.writeln('  - Path: $path');
+    sb.writeln('  - Method: ${method.toUpperCase()}');
+    sb.writeln('  - Duration: ${duration.inMilliseconds}ms');
+
+    if (params != null) {
+      sb.writeln('  - Parameters:');
+      sb.writeln(_formatJson(params, indent: '    '));
+    }
+
+    if (response != null) {
+      sb.writeln('  - Response:');
+      sb.writeln(_formatJson(response, indent: '    '));
+    }
+
+    sb.write('-------------------------------------------');
+
+    developer.log(
+      sb.toString(),
+      name: 'API_LOG',
+      time: DateTime.now(),
+      level: isError ? 1000 : 0,
+    );
+  }
+
   /// 格式化为 JSON 字符串
-  static String _formatJson(Object? message) {
+  static String _formatJson(Object? message, {String indent = '  '}) {
     try {
+      final encoder = JsonEncoder.withIndent(indent);
       if (message is String) {
-        // 尝试解析字符串是否已经是 JSON
         final decoded = json.decode(message);
-        return const JsonEncoder.withIndent('  ').convert(decoded);
+        return encoder.convert(decoded);
       }
-      return const JsonEncoder.withIndent('  ').convert(message);
+      return encoder.convert(message);
     } catch (e) {
-      // 当解析 JSON 失败时，输出提示信息并附带原始文本内容
-      return '⚠️ [Invalid JSON Format] Outputting as text:\n${message?.toString()}';
+      return '$indent⚠️ [Invalid JSON Format] Outputting as text:\n$indent${message?.toString()}';
     }
   }
 }

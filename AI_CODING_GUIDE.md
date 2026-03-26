@@ -36,6 +36,7 @@
   - **其他滑入 (slideLeft, slideTop, slideBottom)**: 可选的侧滑/上下滑入动画，时长 350ms。
   - **渐隐动画 (fadeIn)**: 时长 200ms。
   - 在 `GoRoute` 中使用 `pageBuilder: (context, state) => _buildPage(...)` 接入，默认 `type` 为 `slideRight`。
+  - **注意**: 底部导航栏的菜单主页面（Tab 页）统一**不使用**跳转动画，直接使用 `builder` 接入。
 
 ## 3. UI 编码规范
 
@@ -63,10 +64,47 @@
   - **逻辑分离**: 业务逻辑必须封装在 Cubit/Bloc 中，Widget 仅负责 UI 展示。
 - **日志打印 (LogUtil)**:
   - 统一使用 [LogUtil](file:///Users/chen/Project/Codes/flutter_demo/lib/core/utils/log_util.dart) 进行日志打印。
-  - **dart:developer.log**: 使用 `dart:developer` 的 `log` 函数，确保在调试控制台（如 DevTools）中有更好的集成效果，并自动处理长文本输出。
-  - **LogFormat.text**: 默认文本输出格式。
-  - **LogFormat.json**: 结构化 JSON 输出格式，适用于复杂对象和 API 数据。
-  - 仅在 `kDebugMode` 下输出日志。
+  - **接口日志收口**: **禁止**在业务页面或 Cubit/Bloc 中手动打印接口请求和响应日志。
+  - **统一处理**: 所有接口请求日志已由 `ApiService` 内部通过 `LogUtil.logApi` 统一处理，确保原子化输出（请求路径、方法、参数、响应、耗时）。
+  - **LogFormat.json**: 接口响应默认采用 JSON 美化输出。
+  - **使用示例**:
+    ```dart
+    // 普通文本日志
+    LogUtil.log('这是一条普通文本日志');
+
+    // JSON 对象日志
+    LogUtil.log(
+      {'id': 100, 'name': '测试对象', 'active': true, 'tags': ['flutter', 'demo']},
+      format: LogFormat.json,
+    );
+
+    // 格式化 JSON 字符串
+    LogUtil.log('{"code": 200, "data": {"list": [1, 2, 3]}}', format: LogFormat.json);
+    ```
+
+- **网络服务 (ApiService)**:
+  - 统一使用全局实例 `apiService` ([api_service.dart](file:///Users/chen/Project/Codes/flutter_demo/lib/core/services/api_service.dart))。
+  - **方法调用**: `request` 方法始终返回 `ApiResponse<T>` 对象，**禁止**在业务层编写 `try-catch` 处理网络异常。
+  - **证书固定 (Certificate Pinning)**: 通过 `apiService.setTrustedCertificates([pemString])` 配置受信任的证书列表。该功能仅在原生平台（iOS/Android）生效。
+  - **结果处理**: 通过 `response.isSuccess` 判断请求状态，`response.data` 获取数据，`response.message` 获取错误信息。
+  - **HttpMethod**: 显式指定 `get`, `post`, `put`, `delete` 等。
+  - **使用示例**:
+    ```dart
+    // GET 请求示例
+    final response = await apiService.request('https://httpstat.us/200');
+    if (response.isSuccess) {
+      // 处理成功逻辑
+    } else {
+      // 处理失败逻辑 (错误码: response.code, 错误信息: response.message)
+    }
+
+    // POST 请求示例
+    await apiService.request(
+      '/api/v1/user',
+      method: HttpMethod.post,
+      params: {'name': 'Trae', 'age': 1},
+    );
+    ```
 
 ## 5. 编码原则
 

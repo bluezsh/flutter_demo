@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/utils/log_util.dart';
 
 /// 路由状态类
 class RouterState {
@@ -24,6 +25,8 @@ class RouterCubit extends Cubit<RouterState> {
   /// 更新当前路径
   void updatePath(String path) {
     if (state.currentPath == path) return;
+
+    LogUtil.log('📍 Route Changed: $path');
 
     emit(state.copyWith(
       currentPath: path,

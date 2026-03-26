@@ -45,9 +45,12 @@ class AppRouter {
       navigatorKey: navigatorKey,
       routes: [
         GoRoute(
-          path: AppRoute.app.path,
-          builder: (context, state) => const App(),
+        path: AppRoute.app.path,
+        pageBuilder: (context, state) => _buildPage(
+          child: const App(),
+          key: state.pageKey,
         ),
+      ),
         GoRoute(
           path: AppRoute.details.path,
           pageBuilder: (context, state) => _buildPage(
@@ -69,29 +72,29 @@ class AppRouter {
           },
           branches: [
             StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: AppRoute.home.path,
-                  builder: (context, state) => const HomePage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: AppRoute.discovery.path,
-                  builder: (context, state) => const DiscoveryPage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: AppRoute.profile.path,
-                  builder: (context, state) => const ProfilePage(),
-                ),
-              ],
-            ),
+            routes: [
+              GoRoute(
+                path: AppRoute.home.path,
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoute.discovery.path,
+                builder: (context, state) => const DiscoveryPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoute.profile.path,
+                builder: (context, state) => const ProfilePage(),
+              ),
+            ],
+          ),
           ],
         ),
       ],
