@@ -5,6 +5,8 @@ import '../../core/widgets/custom_app_bar.dart';
 import '../../shared/app_text_style.dart';
 
 import '../../core/widgets/custom_alert.dart';
+import '../../core/utils/loading_util.dart';
+import '../../core/utils/toast_util.dart';
 
 class DiscoveryPage extends StatelessWidget {
   const DiscoveryPage({super.key});
@@ -29,6 +31,16 @@ class DiscoveryPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                LoadingUtil.show();
+                Future.delayed(const Duration(seconds: 2), () {
+                  LoadingUtil.hide();
+                });
+              },
+              child: const Text('测试 Loading (2秒后自动关闭)'),
+            ),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () {
                 CustomAlert.showCustomDialog(
@@ -234,6 +246,64 @@ class DiscoveryPage extends StatelessWidget {
                 );
               },
               child: const Text('测试纯列表 BottomSheet'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => ToastUtil.show('这是一条普通消息'),
+              child: const Text('Toast - 普通消息'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => ToastUtil.show(
+                '自定义持续时间 3秒',
+                duration: const Duration(seconds: 3),
+              ),
+              child: const Text('Toast - 自定义时间'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => ToastUtil.showCustom(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.favorite, color: Colors.red, size: 40),
+                      SizedBox(height: 12),
+                      Text('自定义 Widget Toast', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+              ),
+              child: const Text('Toast - 自定义Widget'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => ToastUtil.showCustom(
+                position: ToastPosition.top,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade500,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '顶部成功提示',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              child: const Text('Toast - 顶部自定义'),
             ),
           ],
         ),
