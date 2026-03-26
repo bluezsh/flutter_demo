@@ -4,6 +4,8 @@ import '../../core/widgets/base_page.dart';
 import '../../core/widgets/custom_app_bar.dart';
 import '../../app/router/app_routes.dart';
 
+import '../../shared/app_text_style.dart';
+
 class DetailsPage extends StatelessWidget {
   const DetailsPage({super.key});
 
@@ -15,7 +17,14 @@ class DetailsPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('这是二级页面：详情页内容'),
+            Text(
+              '这是二级页面：详情页内容',
+              style: AppTextStyle.getStyle(
+                fontFamily: 'Roboto',
+                fontSize: 18,
+                color: Colors.black87,
+              ),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => context.go(AppRoute.discovery.path),

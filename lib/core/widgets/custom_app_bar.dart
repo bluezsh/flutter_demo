@@ -22,22 +22,67 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(
-        title,
-        style: titleStyle ?? const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    final Color effectiveBackgroundColor = backgroundColor ?? Theme.of(context).primaryColor;
+    final TextStyle effectiveTitleStyle = titleStyle ??
+        const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        );
+
+    return Container(
+      color: effectiveBackgroundColor,
+      child: SafeArea(
+        bottom: false,
+        child: Container(
+          height: height,
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.black12,
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Stack(
+            children: [
+              // 居中的标题
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 56), // 为左右预留空间，防止标题过长重叠
+                  child: Text(
+                    title,
+                    style: effectiveTitleStyle,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              // 左侧返回键或自定义 leading
+              Align(
+                alignment: Alignment.centerLeft,
+                child: leading ??
+                    (showBackButton && Navigator.of(context).canPop()
+                        ? IconButton(
+                            icon: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
+                            onPressed: () => Navigator.of(context).pop(),
+                          )
+                        : null),
+              ),
+              // 右侧操作栏
+              if (actions != null)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: actions!,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
-      centerTitle: true,
-      backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
-      elevation: 0,
-      leading: leading ?? (showBackButton && Navigator.of(context).canPop()
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back_ios, size: 20),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          : null),
-      actions: actions,
-      toolbarHeight: height,
     );
   }
 

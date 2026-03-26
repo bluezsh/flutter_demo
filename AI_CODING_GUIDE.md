@@ -85,7 +85,6 @@
 - **网络服务 (ApiService)**:
   - 统一使用全局实例 `apiService` ([api_service.dart](file:///Users/chen/Project/Codes/flutter_demo/lib/core/services/api_service.dart))。
   - **方法调用**: `request` 方法始终返回 `ApiResponse<T>` 对象，**禁止**在业务层编写 `try-catch` 处理网络异常。
-  - **证书固定 (Certificate Pinning)**: 通过 `apiService.setTrustedCertificates([pemString])` 配置受信任的证书列表。该功能仅在原生平台（iOS/Android）生效。
   - **结果处理**: 通过 `response.isSuccess` 判断请求状态，`response.data` 获取数据，`response.message` 获取错误信息。
   - **HttpMethod**: 显式指定 `get`, `post`, `put`, `delete` 等。
   - **使用示例**:

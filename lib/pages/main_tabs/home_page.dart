@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../app/router/app_routes.dart';
 import '../../app/router/cubit/router_cubit.dart';
 
+import '../../shared/app_text_style.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -20,11 +22,26 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('这是首页内容'),
+            Text(
+              '这是首页内容',
+              style: AppTextStyle.getStyle(
+                fontFamily: 'Roboto',
+                fontSize: 20,
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 20),
             BlocBuilder<RouterCubit, RouterState>(
               builder: (context, state) {
-                return Text('当前路由路径: ${state.currentPath}');
+                return Text(
+                  '当前路由路径: ${state.currentPath}',
+                  style: AppTextStyle.getStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                );
               },
             ),
             const SizedBox(height: 30),

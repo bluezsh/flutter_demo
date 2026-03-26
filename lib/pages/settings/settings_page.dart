@@ -2,15 +2,24 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/base_page.dart';
 import '../../core/widgets/custom_app_bar.dart';
 
+import '../../shared/app_text_style.dart';
+
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const BasePage(
-      appBar: CustomAppBar(title: '设置'),
+    return BasePage(
+      appBar: const CustomAppBar(title: '设置'),
       body: Center(
-        child: Text('这是二级页面：设置页内容'),
+        child: Text(
+          '这是二级页面：设置页内容',
+          style: AppTextStyle.getStyle(
+            fontFamily: 'Roboto',
+            fontSize: 18,
+            color: Colors.black54,
+          ),
+        ),
       ),
     );
   }
