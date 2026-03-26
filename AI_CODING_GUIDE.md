@@ -115,7 +115,100 @@
 - **注释**: 为复杂的逻辑或公共组件编写清晰的 DartDoc 注释。
 - **响应式布局**: 使用 `Flexible`, `Expanded` 或 `MediaQuery` 确保应用在不同屏幕尺寸下表现良好。
 
-## 6. 新增功能工作流 (Workflow)
+## 6. 自定义组件使用指南
+
+### CustomAlert 组件
+
+`CustomAlert` 是项目中的自定义弹窗组件，提供统一的弹窗和底部弹窗样式。
+
+#### 功能特性
+- **背景模糊**: 支持背景模糊效果
+- **高度控制**: 支持固定高度和自适应高度
+- **动画效果**: 平滑的弹出动画
+- **回调通知**: 支持关闭时的回调
+- **全局上下文**: 使用 `navigatorKey` 获取全局上下文
+
+#### 使用方法
+
+**1. 自定义对话框 (showCustomDialog)**
+```dart
+CustomAlert.showCustomDialog(
+  child: Container(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('标题'),
+        Text('内容'),
+      ],
+    ),
+  ),
+  blurAmount: 5.0,
+  onDismissed: () {
+    debugPrint('对话框已关闭');
+  },
+);
+```
+
+**2. 自定义底部弹窗 (showCustomBottom)**
+
+*自适应高度模式*:
+```dart
+CustomAlert.showCustomBottom(
+  child: Container(
+    child: Column(
+      children: [
+        Text('标题'),
+        Text('内容'),
+      ],
+    ),
+  ),
+);
+```
+
+*固定高度模式*:
+```dart
+CustomAlert.showCustomBottom(
+  child: Container(
+    child: ListView.builder(
+      itemCount: 50,
+      itemBuilder: (context, index) => ListTile(
+        title: Text('项目 $index'),
+      ),
+    ),
+  ),
+  fixedHeight: 400,
+  blurAmount: 5.0,
+  onDismissed: () {
+    debugPrint('BottomSheet 已关闭');
+  },
+);
+```
+
+#### 参数说明
+
+**showCustomDialog 参数**:
+- `child`: 必需，弹窗显示的 Widget 内容
+- `horizontalMargin`: 可选，水平边距，默认 20.0
+- `barrierDismissible`: 可选，点击外部是否关闭，默认 true
+- `barrierColor`: 可选，遮罩颜色，默认黑色带 0.6 透明度
+- `blurAmount`: 可选，背景模糊度，默认 0.0
+- `onDismissed`: 可选，关闭时的回调函数
+
+**showCustomBottom 参数**:
+- `child`: 必需，BottomSheet 显示的 Widget 内容
+- `barrierDismissible`: 可选，点击外部是否关闭，默认 true
+- `barrierColor`: 可选，遮罩颜色，默认黑色带 0.6 透明度
+- `blurAmount`: 可选，背景模糊度，默认 0.0
+- `onDismissed`: 可选，关闭时的回调函数
+- `fixedHeight`: 可选，固定高度，如果未指定则完全自适应高度
+
+#### 最佳实践
+- **内容高度**: 根据内容复杂度选择固定高度或自适应高度
+- **模糊效果**: 适度的模糊效果可以提升用户体验，但不要过度使用
+- **回调通知**: 使用回调来处理弹窗关闭后的逻辑
+- **性能优化**: 大量内容时使用 `ListView.builder` 避免性能问题
+
+## 7. 新增功能工作流 (Workflow)
 
 当 AI 接收到新增功能请求时，请按以下步骤操作：
 1. **分析需求**: 确定所属模块及是否需要新路由。
