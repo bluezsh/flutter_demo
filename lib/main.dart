@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_demo/app/router/app_router.dart';
 import 'package:flutter_demo/core/utils/status_bar_util.dart';
 
@@ -11,13 +12,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: AppRouter.router,
-      builder: (context, child) {
-        // Set the status bar color and brightness
-        StatusBarUtil.setColor(Colors.blue, brightness: Brightness.light);
-        return child!;
-      },
+    return BlocProvider.value(
+      value: routerCubit,
+      child: MaterialApp.router(
+        routerConfig: AppRouter.router,
+        builder: (context, child) {
+          // Set the status bar color and brightness
+          StatusBarUtil.setColor(Colors.blue, brightness: Brightness.light);
+          return child!;
+        },
+      ),
     );
   }
 }

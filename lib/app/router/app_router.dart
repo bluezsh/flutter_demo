@@ -8,8 +8,12 @@ import '../../pages/main_tabs/profile_page.dart';
 import '../../pages/details/details_page.dart';
 import '../../pages/settings/settings_page.dart';
 import 'app_routes.dart';
+import 'cubit/router_cubit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+
+/// 全局路由 Cubit 实例
+final routerCubit = RouterCubit();
 
 /// 页面跳转动画类型
 enum _PageTransitionType {
@@ -33,61 +37,74 @@ enum _PageTransitionType {
 }
 
 class AppRouter {
-  static final router = GoRouter(
-    initialLocation: AppRoute.app.path,
-    navigatorKey: navigatorKey,
-    routes: [
-      GoRoute(
-        path: AppRoute.app.path,
-        builder: (context, state) => const App(),
-      ),
-      GoRoute(
-        path: AppRoute.details.path,
-        pageBuilder: (context, state) => _buildPage(
-          child: const DetailsPage(),
-          key: state.pageKey,
+  static final GoRouter router = _createRouter();
+
+  static GoRouter _createRouter() {
+    final router = GoRouter(
+      initialLocation: AppRoute.app.path,
+      navigatorKey: navigatorKey,
+      routes: [
+        GoRoute(
+          path: AppRoute.app.path,
+          builder: (context, state) => const App(),
         ),
-      ),
-      GoRoute(
-        path: AppRoute.settings.path,
-        pageBuilder: (context, state) => _buildPage(
-          child: const SettingsPage(),
-          key: state.pageKey,
+        GoRoute(
+          path: AppRoute.details.path,
+          pageBuilder: (context, state) => _buildPage(
+            child: const DetailsPage(),
+            key: state.pageKey,
+          ),
         ),
-      ),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return MainTabPage(navigationShell: navigationShell);
-        },
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoute.home.path,
-                builder: (context, state) => const HomePage(),
-              ),
-            ],
+        GoRoute(
+          path: AppRoute.settings.path,
+          pageBuilder: (context, state) => _buildPage(
+            child: const SettingsPage(),
+            key: state.pageKey,
+            type: _PageTransitionType.fadeIn,
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoute.discovery.path,
-                builder: (context, state) => const DiscoveryPage(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoute.profile.path,
-                builder: (context, state) => const ProfilePage(),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ],
-  );
+        ),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return MainTabPage(navigationShell: navigationShell);
+          },
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoute.home.path,
+                  builder: (context, state) => const HomePage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoute.discovery.path,
+                  builder: (context, state) => const DiscoveryPage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoute.profile.path,
+                  builder: (context, state) => const ProfilePage(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    router.routerDelegate.addListener(() {
+      final String path =
+          router.routerDelegate.currentConfiguration.uri.toString();
+      routerCubit.updatePath(path);
+    });
+
+    return router;
+  }
 
   /// 构建带动画的页面
   static CustomTransitionPage<T> _buildPage<T>({

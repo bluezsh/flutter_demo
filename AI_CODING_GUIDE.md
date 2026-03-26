@@ -53,10 +53,20 @@
   - 方法/变量: `lowerCamelCase` (例如: `buildHeader`, `isLoaded`)。
   - 文件名: `snake_case` (例如: `home_page.dart`)。
 
-## 4. 状态管理与逻辑分离
-
-- 目前项目结构较为轻量，简单的状态可使用 `StatefulWidget`。
-- 对于复杂的业务逻辑，应从 `build` 方法中分离，提取到单独的方法或 Controller/Provider 中（根据后续引入的库而定）。
+- **状态管理 (flutter_bloc)**:
+  - 统一使用 `flutter_bloc` 进行状态管理。
+  - **简单状态**: 优先使用 `Cubit`。
+  - **复杂异步/多事件状态**: 使用 `Bloc`。
+  - **Provider 注入**: 在 `main.dart` 或页面入口处使用 `BlocProvider` 或 `MultiBlocProvider`。
+  - **全局 Cubit**: 对于需要跨模块共享的状态（如 `RouterCubit`），应在 `main.dart` 顶层注入。
+  - **UI 消费**: 使用 `BlocBuilder`, `BlocListener` 或 `BlocConsumer` 进行响应式更新。
+  - **逻辑分离**: 业务逻辑必须封装在 Cubit/Bloc 中，Widget 仅负责 UI 展示。
+- **日志打印 (LogUtil)**:
+  - 统一使用 [LogUtil](file:///Users/chen/Project/Codes/flutter_demo/lib/core/utils/log_util.dart) 进行日志打印。
+  - **dart:developer.log**: 使用 `dart:developer` 的 `log` 函数，确保在调试控制台（如 DevTools）中有更好的集成效果，并自动处理长文本输出。
+  - **LogFormat.text**: 默认文本输出格式。
+  - **LogFormat.json**: 结构化 JSON 输出格式，适用于复杂对象和 API 数据。
+  - 仅在 `kDebugMode` 下输出日志。
 
 ## 5. 编码原则
 
