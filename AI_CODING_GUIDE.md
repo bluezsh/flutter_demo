@@ -30,6 +30,12 @@
 - **跳转方式**:
   - **一级页面/状态切换**: 使用 `context.go(AppRoute.xxx.path)`。
   - **二级/详情页面**: 使用 `context.push(AppRoute.xxx.path)`，以保留返回栈。
+- **页面跳转动画**:
+  - 动画枚举 `_PageTransitionType` 和构建方法 `_buildPage` 私有实现在 [app_router.dart](file:///Users/chen/Project/Codes/flutter_demo/lib/app/router/app_router.dart) 中。
+  - **右侧滑入 (slideRight)**: 模仿 iOS 原生效果，为项目**默认动画**，时长 350ms。
+  - **其他滑入 (slideLeft, slideTop, slideBottom)**: 可选的侧滑/上下滑入动画，时长 350ms。
+  - **渐隐动画 (fadeIn)**: 时长 200ms。
+  - 在 `GoRoute` 中使用 `pageBuilder: (context, state) => _buildPage(...)` 接入，默认 `type` 为 `slideRight`。
 
 ## 3. UI 编码规范
 

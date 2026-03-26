@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_demo/app/router/app_router.dart';
 import 'package:flutter_demo/core/utils/status_bar_util.dart';
 
