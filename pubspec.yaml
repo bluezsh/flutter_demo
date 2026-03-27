@@ -37,6 +37,8 @@ dependencies:
   go_router: ^17.1.0
   flutter_bloc: ^9.1.1
   dio: ^5.9.2
+  dio_http2_adapter: ^2.0.0
+  crypto: ^3.0.0
   shared_preferences: ^2.5.5
   flutter_secure_storage: ^10.0.0
 

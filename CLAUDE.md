@@ -48,6 +48,7 @@ lib/
 | 路由管理 | go_router | ^17.1.0 |
 | 状态管理 | flutter_bloc | ^9.1.1 |
 | 网络请求 | dio | ^5.9.2 |
+| 证书固定 | dio_http2_adapter + crypto | ^2.7.0 + ^3.0.7 |
 | 安全存储 | flutter_secure_storage | ^10.0.0 |
 | 本地存储 | shared_preferences | ^2.5.5 |
 
@@ -388,6 +389,59 @@ flutter test test/core/utils/toast_util_test.dart
 - 使用单引号字符串
 - 工具类使用私有构造函数实现单例模式
 - 组件优先使用 `const` 构造函数
+
+## 依赖管理
+
+### ⚠️ 第三方库版本要求
+
+**添加或更新第三方库时，必须使用最新稳定版本。**
+
+#### 操作流程
+
+1. **添加新依赖时**：
+   ```bash
+   # 搜索包并查看最新版本
+   flutter pub add package_name
+   # 或手动指定版本前（先确认 pub.dev 上的最新版本）
+   ```
+
+2. **定期更新依赖**：
+   ```bash
+   # 检查过时的包
+   flutter pub outdated
+
+   # 更新依赖（会更新到兼容约束内的最新版本）
+   flutter pub upgrade
+
+   # 升级特定包到最新版本（放宽版本约束）
+   flutter pub upgrade --major-versions package_name
+   ```
+
+3. **添加前检查**：
+   - 访问 [pub.dev](https://pub.dev) 确认该包的最新稳定版本
+   - 查看该包的 **Last published** 时间，避免使用长期未维护的包
+   - 查看平台的兼容性（Android/iOS/Web/Desktop）
+   - 查看 Likes 和 Popularity 评分
+
+4. **添加后验证**：
+   ```bash
+   # 确保所有依赖都是最新的
+   flutter pub outdated
+   ```
+   - **直接依赖** 必须显示 `all up-to-date`
+   - **传递依赖** 的旧版本若受 Flutter SDK 约束限制可忽略
+
+#### 当前依赖版本
+
+| 包 | 版本 | 用途 |
+|---|---|---|
+| go_router | ^17.1.0 | 路由管理 |
+| flutter_bloc | ^9.1.1 | 状态管理 |
+| dio | ^5.9.2 | 网络请求 |
+| dio_http2_adapter | ^2.7.0 | HTTP/2 适配器（证书固定） |
+| crypto | ^3.0.7 | 加密哈希（证书固定） |
+| flutter_secure_storage | ^10.0.0 | 安全存储 |
+| shared_preferences | ^2.5.5 | 本地存储 |
 
 ## 常见任务
 

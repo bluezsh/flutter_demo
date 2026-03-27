@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import '../../config/app_env_config.dart';
 import '../../utils/log_util.dart';
+import '../certificate_pinning/certificate_pinning.dart';
 
 /// 网络请求方法枚举
 enum HttpMethod {
@@ -38,9 +40,39 @@ class ApiService {
   late Dio _dio;
 
   ApiService._internal() {
+    // 根据是否配置了 SSL 公钥哈希决定是否启用证书固定
+    if (AppEnvConfig.enableCertificatePinning) {
+      _initPinnedDio();
+    } else {
+      _initNormalDio();
+    }
+  }
+
+  /// 初始化带证书固定的 Dio
+  void _initPinnedDio() {
+    try {
+      // 加载公钥哈希
+      CertificatePinning.setPublicKeyHash(AppEnvConfig.sslHash);
+
+      _dio = CertificatePinning.createPinnedDio(
+        baseUrl: AppEnvConfig.apiBaseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {'Content-Type': 'application/json; charset=utf-8'},
+      );
+    } catch (e) {
+      // 证书固定初始化失败，回退到普通模式
+      LogUtil.log('Certificate pinning init failed, fallback to normal mode: $e');
+      _initNormalDio();
+    }
+  }
+
+  /// 初始化普通 Dio
+  void _initNormalDio() {
     _dio = Dio(BaseOptions(
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
+      baseUrl: AppEnvConfig.apiBaseUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
       contentType: 'application/json; charset=utf-8',
     ));
   }
