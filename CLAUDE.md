@@ -16,8 +16,14 @@ lib/
 │       └── cubit/router_cubit.dart # 路由状态管理
 ├── core/                         # 核心功能
 │   ├── services/                 # 服务层
-│   │   └── api_service/          # API服务封装
-│   │       └── api_service.dart  # 统一网络请求
+│   │   ├── api_service/          # 底层网络服务（禁止直接使用）
+│   │   │   └── api_service.dart  # Dio封装
+│   │   ├── api_client/           # 业务API客户端（使用此）
+│   │   │   └── api_client.dart   # Token管理、缓存、请求封装
+│   │   ├── secure_storage_service/ # 安全存储
+│   │   │   └── secure_storage_service.dart # Token存储
+│   │   └── storage_service/      # 本地存储
+│   │       └── storage_service.dart # 普通数据、缓存
 │   ├── utils/                    # 工具类
 │   │   ├── loading_util.dart     # Loading遮罩
 │   │   ├── log_util.dart         # 日志工具
@@ -41,7 +47,9 @@ lib/
 |------|------|------|
 | 路由管理 | go_router | ^17.1.0 |
 | 状态管理 | flutter_bloc | ^9.1.1 |
-| 网络请求 | dio | ^5.7.0 |
+| 网络请求 | dio | ^5.9.2 |
+| 安全存储 | flutter_secure_storage | ^10.0.0 |
+| 本地存储 | shared_preferences | ^2.5.5 |
 
 ## 命名规范
 
@@ -151,6 +159,45 @@ StatusBarUtil.setDarkStyle();
 StatusBarUtil.setLightStyle();
 ```
 
+## 本地存储
+
+### Token 安全存储
+
+使用 `SecureStorageService` 存储 Token（Keychain/Keystore）：
+
+```dart
+// 保存 Token
+await secureStorageService.setAccessToken('xxx');
+await secureStorageService.setRefreshToken('xxx');
+
+// 获取 Token
+final token = await secureStorageService.getAccessToken();
+final refresh = await secureStorageService.getRefreshToken();
+
+// 删除 Token
+await secureStorageService.deleteToken(TokenType.accessToken);
+await secureStorageService.clearAll();  // 清除所有
+```
+
+### 普通数据存储
+
+使用 `StorageService` 存储普通数据（SharedPreferences）：
+
+```dart
+// String
+storageService.setString(StorageKey.apiCache, 'data');
+storageService.getString(StorageKey.apiCache);
+
+// Bool
+storageService.setBool(StorageKey.apiCache, true);
+storageService.getBool(StorageKey.apiCache);
+
+// 通用操作
+storageService.containsKey(StorageKey.apiCache);
+storageService.remove(StorageKey.apiCache);
+storageService.clear();
+```
+
 ## 组件使用
 
 ### BasePage
@@ -202,11 +249,87 @@ Text(
 
 ## 网络请求
 
-使用 `ApiService` 进行统一的网络请求：
+### ⚠️ 重要说明
+
+- **禁止直接使用 `ApiService`** - 这是底层网络服务封装
+- **业务请求统一使用 `ApiClient`** - 提供 Token 管理、自动刷新、接口缓存等功能
+
+### ApiClient 使用
 
 ```dart
-final response = await ApiService.get('/api/endpoint');
-final response = await ApiService.post('/api/endpoint', data: {...});
+// GET 请求
+final response = await apiClient.request('/api/user/info');
+
+// GET 请求（带参数）
+await apiClient.request('/api/user/list', params: {'page': 1, 'size': 20});
+
+// POST 请求
+await apiClient.request(
+  '/api/user/login',
+  method: HttpMethod.post,
+  data: {'username': 'xxx', 'password': 'xxx'},
+);
+
+// PUT 请求
+await apiClient.request(
+  '/api/user/profile',
+  method: HttpMethod.put,
+  data: {'name': '张三'},
+);
+
+// DELETE 请求
+await apiClient.request('/api/user/123', method: HttpMethod.delete);
+
+// GET 请求（使用缓存）
+await apiClient.request(
+  '/api/config',
+  useCache: true,
+  cacheMinutes: 10,
+);
+```
+
+### Token 管理
+
+`ApiClient` 自动处理 Token：
+
+- 请求时自动携带 `Authorization: Bearer {token}` 头
+- 401 响应自动刷新 Token 并重试请求
+- 刷新失败自动清除 Token
+
+```dart
+// 配置刷新Token接口路径
+apiClient.refreshTokenPath = '/auth/refresh';
+
+// 登出（清除Token和缓存）
+await apiClient.logout();
+```
+
+### 接口缓存
+
+仅对 GET 请求有效：
+
+```dart
+// 使用缓存（默认5分钟）
+await apiClient.request('/api/config', useCache: true);
+
+// 自定义缓存时长
+await apiClient.request('/api/config', useCache: true, cacheMinutes: 10);
+
+// 清除所有缓存
+await apiClient.clearCache();
+```
+
+### 响应处理
+
+```dart
+final response = await apiClient.request('/api/user/info');
+
+if (response.isSuccess) {
+  final data = response.data;
+} else {
+  final code = response.code;
+  final message = response.message;
+}
 ```
 
 ## 状态管理
@@ -238,15 +361,24 @@ context.read<MyCubit>().doSomething();
 
 ## 测试
 
-### 运行所有测试
+### 测试规范
+
+1. **测试代码在测试通过后删除**
+   - 测试仅用于验证功能正确性
+   - 通过后删除测试文件，不保留在代码库中
+   - 保留 `test/widget_test.dart` 作为示例
+
+2. **添加测试文件**
+   - 测试文件与源文件保持相同的目录结构
+   - 测试文件命名：`{filename}_test.dart`
+
+### 运行测试
 
 ```bash
+# 运行所有测试
 flutter test
-```
 
-### 运行特定测试
-
-```bash
+# 运行特定测试
 flutter test test/core/utils/toast_util_test.dart
 ```
 

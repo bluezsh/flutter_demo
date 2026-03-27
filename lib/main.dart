@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_demo/app/router/app_router.dart';
+import 'package:flutter_demo/core/services/storage_service/storage_service.dart';
 import 'package:flutter_demo/core/utils/status_bar_util.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await storageService.init();
   runApp(const MyApp());
 }
 
